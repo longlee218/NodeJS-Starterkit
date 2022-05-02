@@ -1,7 +1,7 @@
 import DatabaseOptions from '../config/database';
 import mongoose from 'mongoose';
 
-export function connectMongoDB() {
+export const connectMongoDB = () => {
 	const mongooseOptions = DatabaseOptions.mongoose;
 	mongoose.connection.on('connected', () => {
 		console.log('[mongodb] connected success');
@@ -20,4 +20,4 @@ export function connectMongoDB() {
 		dbName: mongooseOptions.dbName,
 		connectTimeoutMS: mongooseOptions.connectTimeoutMS,
 	});
-}
+};

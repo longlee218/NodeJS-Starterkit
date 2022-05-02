@@ -95,6 +95,7 @@ app.use(errorHandle);
  */
 const apiV1 = '/api/v1';
 app.use(apiV1, Route.userRoute);
+app.use(apiV1, Route.paymentRoute);
 
 /**
  * Catch error process

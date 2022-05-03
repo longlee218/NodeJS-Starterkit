@@ -10,7 +10,6 @@ import path from 'path';
 
 dotenv.config({
 	path: path.join(process.cwd(), '.env'),
-	debug: process.env.MODE === 'develop',
 });
 
 const normalizePort = (val: string) => {
@@ -101,7 +100,7 @@ app.use(apiV1, Route.paymentRoute);
  * Catch error process
  */
 process.on('uncaughtException', (err) => {
-	console.log('Shutdown process');
+	console.log(err);
 	console.log('Error process: ' + err);
 	process.exit(1);
 });

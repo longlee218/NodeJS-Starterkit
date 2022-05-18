@@ -1,12 +1,13 @@
 import express, { Express, NextFunction, Request, Response } from 'express';
 
-import Route from './routes';
 import { connectMongoDB } from './services/db.service';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import helmet from 'helmet';
 import http from 'http';
 import path from 'path';
+import makeRoutes from './routes';
+import bodyParser from 'body-parser';
 
 dotenv.config({
 	path: path.join(process.cwd(), '.env'),
@@ -64,7 +65,11 @@ const errorHandle = (
 	res: Response,
 	next: NextFunction
 ) => {
-	console.log('[error-express]: ' + error);
+	const isDevelop = process.env.MODE === 'develop';
+	if (isDevelop) {
+		return res.status(500).json({ msg: error.message, stacks: error });
+	}
+	return res.status(500).json({ msg: 'Oops something went wrong!' });
 };
 
 /**
@@ -78,7 +83,7 @@ httpServer.on('error', onError);
 /**
  * Connect database
  */
-connectMongoDB();
+connectMongoDB(); // turnoff connect mongodb
 
 /**
  *  App Configuration
@@ -87,20 +92,17 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(errorHandle);
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 /**
  * Server Routes
  */
-const apiV1 = '/api/v1';
-app.use(apiV1, Route.userRoute);
-app.use(apiV1, Route.paymentRoute);
+makeRoutes(app);
 
 /**
  * Catch error process
  */
 process.on('uncaughtException', (err) => {
-	console.log(err);
 	console.log('Error process: ' + err);
-	process.exit(1);
 });
